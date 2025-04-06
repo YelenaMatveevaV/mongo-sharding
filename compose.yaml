@@ -12,15 +12,18 @@ services:
         ipv4_address: 174.18.0.10
     volumes:
       - config-data:/data/somedb
+      - ./init-replica.js:/docker-entrypoint-initdb.d/init-replica.js      
     command:
       [
         "--configsvr",  #//запуск в режиме конфигурации
-        "--replSet  config_server",
+        "--replSet",
+        "config_server",
         "--bind_ip_all",
-        "--port 27017"
+        "--port",
+        "27017"
       ] 
     healthcheck:
-      test: [ "CMD", "mongo", "--eval", "somedb.adminCommand('ping')" ]
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
       start_period: 10s
 
@@ -35,16 +38,19 @@ services:
       app-network:
         ipv4_address: 174.18.0.9
     volumes:
-      - shard1-primary-data:/data/somedb
+      - shard1-primary-data:/data/
+      - ./init-replica1.js:/docker-entrypoint-initdb.d/init-replica1.js
     command:
       [
         "--shardsvr", #//запуск в режиме шардинга
-        "--replSet shard1rs", # Одно имя для всех нод реплика-сета
+        "--replSet",
+        "shard1rs", # Одно имя для всех нод реплика-сета
         "--bind_ip_all",
-        "--port 27018"
+        "--port",
+        "27018"
       ]
     healthcheck:
-      test: [ "CMD", "mongo", "--eval", "somedb.adminCommand('ping')" ]
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
       start_period: 10s
 
@@ -54,7 +60,7 @@ services:
     container_name: shard1-secondary1
     restart: always
     ports:
-      - "27019:27018"
+      - "27021:27018"
     networks:
       app-network:
         ipv4_address: 174.18.0.21
@@ -63,12 +69,14 @@ services:
     command:
       [
         "--shardsvr", #//запуск в режиме шардинга
-        "--replSet shard1rs", # Одно имя для всех нод реплика-сета
+        "--replSet",
+        "shard1rs", # Одно имя для всех нод реплика-сета
         "--bind_ip_all",
-        "--port 27018"
+        "--port",
+        "27018"
       ]
     healthcheck:
-      test: [ "CMD", "mongo", "--eval", "somedb.adminCommand('ping')" ]
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
       start_period: 10s
 
@@ -78,7 +86,7 @@ services:
     container_name: shard1-secondary2
     restart: always
     ports:
-      - "27024:27018"
+      - "27022:27018"
     networks:
       app-network:
         ipv4_address: 174.18.0.22
@@ -87,12 +95,14 @@ services:
     command:
       [
         "--shardsvr", #//запуск в режиме шардинга
-        "--replSet shard1rs", # Одно имя для всех нод реплика-сета
+        "--replSet",
+        "shard1rs", # Одно имя для всех нод реплика-сета
         "--bind_ip_all",
-        "--port 27018"
+        "--port",
+        "27018"
       ]
     healthcheck:
-      test: [ "CMD", "mongo", "--eval", "somedb.adminCommand('ping')" ]
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
       start_period: 10s
 
@@ -102,21 +112,24 @@ services:
     container_name: shard2-primary
     restart: always
     ports:
-      - "27021:27019"
+      - "27019:27019"
     networks:
       app-network:
         ipv4_address: 174.18.0.8
     volumes:
       - shard2-primary-data:/data/somedb
+      - ./init-replica2.js:/docker-entrypoint-initdb.d/init-replica2.js      
     command:
       [
         "--shardsvr", #//запуск в режиме шардинга
-        "--replSet shard2rs",
+        "--replSet",
+        "shard2rs",
         "--bind_ip_all", #// обратите внимание - она отличается от реплики 1-го шарда
-        "--port 27019"
+        "--port", 
+        "27019"
       ]
     healthcheck:
-      test: [ "CMD", "mongo", "--eval", "somedb.adminCommand('ping')" ]
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
       start_period: 10s      
 
@@ -126,7 +139,7 @@ services:
     container_name: shard2-secondary1
     restart: always
     ports:
-      - "27022:27019"
+      - "27023:27019"
     networks:
       app-network:
         ipv4_address: 174.18.0.23
@@ -135,12 +148,14 @@ services:
     command:
       [
         "--shardsvr", #//запуск в режиме шардинга
-        "--replSet shard2rs",
+        "--replSet", 
+        "shard2rs",
         "--bind_ip_all", #// обратите внимание - она отличается от реплики 1-го шарда
-        "--port 27019"
+        "--port",
+        "27019"
       ]
     healthcheck:
-      test: [ "CMD", "mongo", "--eval", "somedb.adminCommand('ping')" ]
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
       start_period: 10s    
 
@@ -151,7 +166,7 @@ services:
     container_name: shard2-secondary2
     restart: always
     ports:
-      - "27023:27019"
+      - "27024:27019"
     networks:
       app-network:
         ipv4_address: 174.18.0.24
@@ -160,12 +175,14 @@ services:
     command:
       [
         "--shardsvr", #//запуск в режиме шардинга
-        "--replSet shard2rs",
+        "--replSet",
+        "shard2rs",
         "--bind_ip_all", #// обратите внимание - она отличается от реплики 1-го шарда
-        "--port 27019"
+        "--port", 
+        "27019"
       ]
     healthcheck:
-      test: [ "CMD", "mongo", "--eval", "somedb.adminCommand('ping')" ]
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
       start_period: 10s  
 
@@ -179,23 +196,26 @@ services:
     networks:
       app-network:
         ipv4_address: 174.18.0.7
+    depends_on:
+      - configSrv    
     command:
       [
         "mongos", #//обычная mongo в режиме роутера
         "--configdb", 
         "config_server/configSrv:27017", #//передача данных сервера конфигурации
         "--bind_ip_all",
-        "--port  27020"
+        "--port",
+        "27020"
       ]
     healthcheck:
-      test: [ "CMD", "mongo", "--eval", "somedb.adminCommand('ping')" ]
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
       interval: 5s
       start_period: 10s
 
   pymongo_api:
     container_name: pymongo_api
     build: 
-      context: api_app
+      context: ./api_app
       dockerfile: Dockerfile
     image: kazhem/pymongo_api:1.0.0
     depends_on:
@@ -203,8 +223,15 @@ services:
     ports:
       - 8080:8080
     environment:
-      MONGODB_URL: "mongodb://mongos_router:27020"
+      MONGODB_URL: "mongodb://174.18.0.7:27020"
       MONGODB_DATABASE_NAME: "somedb"
+    networks:
+      - app-network
+ #   healthcheck:
+ #     test: [ "CMD", "curl", "-f", "http://localhost:8080" ]
+ #     interval: 10s
+ #     timeout: 5s
+ #     retries: 3
 
 networks:
   app-network:
